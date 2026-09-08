@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>БAҚЫТ - Шақыру</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
+    h2 { color: #d4af37; text-align: center; margin-bottom: 20px; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: #fff;
+      box-sizing: border-box;
+    }
+    label { display: block; margin: 10px 0; cursor: pointer; }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .admin-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #888;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .guest-item {
+      background: #2a2a2a;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 4px solid #d4af37;
+    }
+    .hint { font-size: 11px; color: #777; text-align: center; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. ФОРМА ДЛЯ ГОСТЕЙ -->
+  <div id="guestSection" class="card">
+    <h2>БАҚЫТ</h2>
+    <p style="text-align: center;">Тойға қатысуыңызды растауыңызды сұраймыз!</p>
+    
+    <form id="rsvpForm">
+      <input type="text" id="guestName" placeholder="Есіміңіз" required>
+      
+      <label><input type="radio" name="status" value="Келемін" required> Келемін</label>
+      <label><input type="radio" name="status" value="Жұбыммен келемін"> Жұбыммен келемін</label>
+      <label><input type="radio" name="status" value="Өкінішке орай, қатыса алмаймын"> Өкінішке орай, қатыса алмаймын</label>
+
+      <button type="submit" class="btn">Жіберу</button>
+    </form>
+
+    <span class="admin-link" onclick="showAdminLogin()">Басқару жүйесіне кіру</span>
+  </div>
+
+  <!-- 2. ВХОД В АДМИНКУ -->
+  <div id="loginSection" class="card" style="display: none;">
+    <h2>Басқару жүйесіне кіру</h2>
+    <p class="hint">ҚҰПИЯ СӨЗ</p>
+    <input type="password" id="adminPassword" placeholder="••••••••">
+    <button onclick="loginAdmin()" class="btn">Кіру</button>
+    <p class="hint">Ескертпе: Әкімші құпия сөзін енгізіңіз (по умолчанию: 50102026)</p>
+    <span class="admin-link" onclick="showGuestForm()">← Шақыруды көру</span>
+  </div>
+
+  <!-- 3. СПИСОК ОТВЕТОВ (АДМИНКА) -->
+  <div id="adminPanel" class="card" style="display: none;">
+    <h2>Жауаптар тізімі</h2>
+    <div id="answersList"></div>
+    <button onclick="clearData()" style="background:#c0392b;" class="btn">Тізімді тазалау</button>
+    <span class="admin-link" onclick="showGuestForm()">← Выйти</span>
+  </div>
+
+  <script>
+    const ADMIN_PASS = "50102026"; // Пароль админа
+
+    // Переключение экранов
+    function showAdminLogin() {
+      document.getElementById('guestSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+    }
+
+    function showGuestForm() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('guestSection').style.display = 'block';
+    }
+
+    // Сохранение ответа гостя
+    document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('guestName').value;
+      const status = document.querySelector('input[name="status"]:checked').value;
+
+      const newAnswer = { name, status, date: new Date().toLocaleTimeString() };
+      
+      let answers = JSON.parse(localStorage.getItem('wedding_answers') || '[]');
+      answers.push(newAnswer);
+      localStorage.setItem('wedding_answers', JSON.stringify(answers));
+
+      alert('Рақмет! Жауабыңыз қабылданды.');
+      this.reset();
+    });
+
+    // Проверка пароля
+    function loginAdmin() {
+      const pass = document.getElementById('adminPassword').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadAnswers();
+      } else {
+        alert('Құпия сөз қате!');
+      }
+    }
+
+    // Вывод списка гостей
+    function loadAnswers() {
+      const listDiv = document.getElementById('answersList');
+      const answers = JSON.parse(localStorage.getItem('wedding_answers') || '[]');
+      
+      if (answers.length === 0) {
+        listDiv.innerHTML = '<p>Әлі жауаптар жоқ.</p>';
+        return;
+      }
+
+      listDiv.innerHTML = answers.map(item => `
+        <div class="guest-item">
+          <strong>${item.name}</strong><br>
+          <span>Статус: ${item.status}</span>
+        </div>
+      `).join('');
+    }
+
+    // Очистка списка
+    function clearData() {
+      if (confirm('Тізімді өшіргіңіз келе ме?')) {
+        localStorage.removeItem('wedding_answers');
+        loadAnswers();
+      }
+    }
+  </script>
+
+</body>
+</html>
