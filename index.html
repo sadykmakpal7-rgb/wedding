@@ -3,173 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>БAҚЫТ - Шақыру</title>
+  <title>БAҚЫТ - Шақыру мен Басқару</title>
   <style>
-    body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    .card {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 400px;
-      box-sizing: border-box;
-    }
-    h2 { color: #d4af37; text-align: center; margin-bottom: 20px; }
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #d4af37;
-      border-radius: 8px;
-      background: #2a2a2a;
-      color: #fff;
-      box-sizing: border-box;
-    }
-    label { display: block; margin: 10px 0; cursor: pointer; }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      background: #e67e22;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-    .admin-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #888;
-      font-size: 12px;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .guest-item {
-      background: #2a2a2a;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      border-left: 4px solid #d4af37;
-    }
-    .hint { font-size: 11px; color: #777; text-align: center; margin-top: 6px; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0f0f0f; color: #f0f0f0; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 440px; }
+    .card { background: #181818; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    h2, h3 { color: #d4af37; text-align: center; margin-top: 0; }
+    .subtitle { color: #888; font-size: 13px; text-align: center; margin-top: -10px; margin-bottom: 20px; }
+    
+    /* Форма */
+    input[type="text"], input[type="password"] { width: 100%; padding: 12px 16px; margin: 8px 0 16px; border: 1px solid #333; border-radius: 10px; background: #222; color: #fff; font-size: 15px; outline: none; }
+    input[type="text"]:focus, input[type="password"]:focus { border-color: #d4af37; }
+    .radio-group label { display: flex; align-items: center; padding: 10px; background: #222; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; }
+    .radio-group input { margin-right: 12px; accent-color: #d4af37; }
+    .btn { width: 100%; padding: 14px; background: #d4af37; color: #111; border: none; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn:hover { background: #e5be48; }
+    .btn-secondary { background: #333; color: #fff; margin-top: 10px; }
+    
+    /* Статистика админки */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: #222; padding: 16px; border-radius: 12px; border: 1px solid #2d2d2d; }
+    .stat-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; }
+    .stat-value { font-size: 24px; font-weight: bold; margin-top: 6px; }
+    .val-yellow { color: #d4af37; }
+    .val-green { color: #2ecc71; }
+    .val-red { color: #e74c3c; }
+    .val-blue { color: #3498db; }
+
+    /* Поиск и список гостей */
+    .search-box { margin-bottom: 15px; }
+    .guest-card { background: #222; border-left: 4px solid #d4af37; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .guest-info { font-size: 14px; }
+    .guest-status { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+    .nav-link { display: block; text-align: center; color: #d4af37; font-size: 13px; margin-top: 15px; cursor: pointer; text-decoration: none; }
+    .toast { background: #222; border: 1px solid #d4af37; padding: 10px 16px; border-radius: 30px; text-align: center; margin-bottom: 15px; font-size: 14px; color: #d4af37; display: none; }
   </style>
 </head>
 <body>
 
-  <!-- 1. ФОРМА ДЛЯ ГОСТЕЙ -->
-  <div id="guestSection" class="card">
-    <h2>БАҚЫТ</h2>
-    <p style="text-align: center;">Тойға қатысуыңызды растауыңызды сұраймыз!</p>
-    
-    <form id="rsvpForm">
-      <input type="text" id="guestName" placeholder="Есіміңіз" required>
+  <div class="container">
+
+    <!-- 1. ФОРМА ДЛЯ ГОСТЕЙ -->
+    <div id="guestView" class="card">
+      <h2>БAҚЫТ</h2>
+      <p class="subtitle">Тойға қатысуыңызды растауыңызды сұраймыз!</p>
+
+      <form id="rsvpForm">
+        <label style="font-size: 13px; color: #ccc;">Аты-жөніңіз (жұбыңызбен келетін болсаңыз, есімдеріңізді бірге жазуыңызды өтінеміз)</label>
+        <input type="text" id="guestName" placeholder="Есіміңіз" required>
+
+        <div class="radio-group">
+          <label><input type="radio" name="status" value="Келемін" required> Келемін</label>
+          <label><input type="radio" name="status" value="Жұбыммен келемін"> Жұбыммен келемін</label>
+          <label><input type="radio" name="status" value="Өкінішке орай, қатыса алмаймын"> Өкінішке орай, қатыса алмаймын</label>
+        </div>
+
+        <button type="submit" class="btn" style="margin-top: 15px;">Жіберу</button>
+      </form>
+
+      <a class="nav-link" onclick="switchView('loginView')">← Басқару жүйесіне кіру</a>
+    </div>
+
+    <!-- 2. ВХОД В АДМИНКУ -->
+    <div id="loginView" class="card" style="display: none;">
+      <h2>Басқару жүйесіне кіру</h2>
+      <p class="subtitle">ҚҰПИЯ СӨЗ</p>
       
-      <label><input type="radio" name="status" value="Келемін" required> Келемін</label>
-      <label><input type="radio" name="status" value="Жұбыммен келемін"> Жұбыммен келемін</label>
-      <label><input type="radio" name="status" value="Өкінішке орай, қатыса алмаймын"> Өкінішке орай, қатыса алмаймын</label>
+      <input type="password" id="adminPassword" placeholder="••••••••">
+      <button onclick="loginAdmin()" class="btn">Кіру</button>
+      <p class="subtitle" style="margin-top: 15px;">Ескертпе: Әкімші құпия сөзін енгізіңіз (50102026)</p>
 
-      <button type="submit" class="btn">Жіберу</button>
-    </form>
+      <a class="nav-link" onclick="switchView('guestView')">← Шақыруды көру</a>
+    </div>
 
-    <span class="admin-link" onclick="showAdminLogin()">Басқару жүйесіне кіру</span>
-  </div>
+    <!-- 3. АДМИН-ПАНЕЛЬ (СТАТИСТИКА И СПИСОК) -->
+    <div id="adminView" style="display: none;">
+      <div id="toast" class="toast">Қош келдіңіз, әкімші!</div>
+      
+      <div class="card">
+        <h2>Қонақтар мен Жауаптар Тізімі</h2>
+        <p class="subtitle">Жалпы статистика және онлайн RSVP жауаптары</p>
 
-  <!-- 2. ВХОД В АДМИНКУ -->
-  <div id="loginSection" class="card" style="display: none;">
-    <h2>Басқару жүйесіне кіру</h2>
-    <p class="hint">ҚҰПИЯ СӨЗ</p>
-    <input type="password" id="adminPassword" placeholder="••••••••">
-    <button onclick="loginAdmin()" class="btn">Кіру</button>
-    <p class="hint">Ескертпе: Әкімші құпия сөзін енгізіңіз (по умолчанию: 50102026)</p>
-    <span class="admin-link" onclick="showGuestForm()">← Шақыруды көру</span>
-  </div>
+        <button onclick="exportCSV()" class="btn btn-secondary" style="margin-bottom: 20px;">📊 CSV Экспорт</button>
 
-  <!-- 3. СПИСОК ОТВЕТОВ (АДМИНКА) -->
-  <div id="adminPanel" class="card" style="display: none;">
-    <h2>Жауаптар тізімі</h2>
-    <div id="answersList"></div>
-    <button onclick="clearData()" style="background:#c0392b;" class="btn">Тізімді тазалау</button>
-    <span class="admin-link" onclick="showGuestForm()">← Выйти</span>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Жалпы жауаптар</div>
+            <div id="statTotal" class="stat-value val-yellow">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Келетіндер саны</div>
+            <div id="statAttending" class="stat-value val-green">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Келмейтіндер саны</div>
+            <div id="statDeclined" class="stat-value val-red">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Қонақтар саны</div>
+            <div id="statGuests" class="stat-value val-blue">0 адам</div>
+          </div>
+        </div>
+
+        <input type="text" id="searchInput" class="search-box" placeholder="Аты бойынша іздеу..." oninput="filterGuests()">
+
+        <div id="guestsList">Загрузка данных...</div>
+
+        <a class="nav-link" onclick="switchView('guestView')">← Выйти</a>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    const ADMIN_PASS = "50102026"; // Пароль админа
+    // ⚠️ Вставьте вашу ссылку на Google Apps Script здесь:
+    const SCRIPT_URL = "ВСТАВЬТЕ_СЮДА_ВАШУ_ССЫЛКУ_ИЗ_ШАГА_1"; 
+    const ADMIN_PASS = "50102026";
+    let allResponses = [];
 
-    // Переключение экранов
-    function showAdminLogin() {
-      document.getElementById('guestSection').style.display = 'none';
-      document.getElementById('loginSection').style.display = 'block';
+    function switchView(viewId) {
+      document.getElementById('guestView').style.display = 'none';
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('adminView').style.display = 'none';
+      document.getElementById(viewId).style.display = 'block';
     }
 
-    function showGuestForm() {
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('guestSection').style.display = 'block';
-    }
-
-    // Сохранение ответа гостя
+    // Отправка данных гостем
     document.getElementById('rsvpForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('guestName').value;
       const status = document.querySelector('input[name="status"]:checked').value;
-
-      const newAnswer = { name, status, date: new Date().toLocaleTimeString() };
       
-      let answers = JSON.parse(localStorage.getItem('wedding_answers') || '[]');
-      answers.push(newAnswer);
-      localStorage.setItem('wedding_answers', JSON.stringify(answers));
+      let guestCount = 0;
+      if (status === "Келемін") guestCount = 1;
+      else if (status === "Жұбыммен келемін") guestCount = 2;
 
-      alert('Рақмет! Жауабыңыз қабылданды.');
-      this.reset();
+      const payload = { name, status, guestCount };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        alert('Рақмет! Жауабыңыз қабылданды.');
+        this.reset();
+      }).catch(err => alert('Қате шықты. Кайталап көріңіз.'));
     });
 
-    // Проверка пароля
+    // Вход в админку
     function loginAdmin() {
       const pass = document.getElementById('adminPassword').value;
       if (pass === ADMIN_PASS) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadAnswers();
+        switchView('adminView');
+        showToast();
+        fetchData();
       } else {
         alert('Құпия сөз қате!');
       }
     }
 
-    // Вывод списка гостей
-    function loadAnswers() {
-      const listDiv = document.getElementById('answersList');
-      const answers = JSON.parse(localStorage.getItem('wedding_answers') || '[]');
-      
-      if (answers.length === 0) {
-        listDiv.innerHTML = '<p>Әлі жауаптар жоқ.</p>';
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    // Получение данных из Google Таблицы
+    function fetchData() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          allResponses = data;
+          updateDashboard(data);
+        })
+        .catch(err => {
+          document.getElementById('guestsList').innerHTML = 'Ошибка загрузки данных.';
+        });
+    }
+
+    // Обновление статистики и списка
+    function updateDashboard(data) {
+      let total = data.length;
+      let attending = 0;
+      let declined = 0;
+      let totalGuests = 0;
+
+      data.forEach(item => {
+        if (item.status === 'Өкінішке орай, қатыса алмаймын') {
+          declined++;
+        } else {
+          attending++;
+          totalGuests += parseInt(item.guestCount || 0);
+        }
+      });
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statAttending').innerText = attending;
+      document.getElementById('statDeclined').innerText = declined;
+      document.getElementById('statGuests').innerText = totalGuests + " адам";
+
+      renderList(data);
+    }
+
+    function renderList(data) {
+      const listDiv = document.getElementById('guestsList');
+      if (data.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center; color:#666;">Жауаптар әлі жоқ.</p>';
         return;
       }
 
-      listDiv.innerHTML = answers.map(item => `
-        <div class="guest-item">
-          <strong>${item.name}</strong><br>
-          <span>Статус: ${item.status}</span>
+      listDiv.innerHTML = data.slice().reverse().map(item => `
+        <div class="guest-card">
+          <div class="guest-info">
+            <strong>${item.name}</strong>
+            <div class="guest-status">${item.status}</div>
+          </div>
         </div>
       `).join('');
     }
 
-    // Очистка списка
-    function clearData() {
-      if (confirm('Тізімді өшіргіңіз келе ме?')) {
-        localStorage.removeItem('wedding_answers');
-        loadAnswers();
-      }
+    function filterGuests() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allResponses.filter(r => r.name.toLowerCase().includes(query));
+      renderList(filtered);
+    }
+
+    function exportCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,Name,Status,GuestCount\n";
+      allResponses.forEach(r => {
+        csvContent += `"${r.name}","${r.status}",${r.guestCount}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "wedding_guests.csv");
+      document.body.appendChild(link);
+      link.click();
     }
   </script>
 
